@@ -49,44 +49,73 @@ def combine_and_clean_variables(df):
     df = df.drop(columns=['online_security', 'online_backup', 'device_protection', 'tech_support'])
     return df
 
-def split_data(df):
-    X = df.drop(columns='churn')
-    y = df.churn
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = .20, random_state = 123)
-    return X_train, X_test, y_train, y_test
 
-def encode(X_train, X_test, col_name):
-    
-    encoded_values = sorted(list(X_train[col_name].unique()))
+
+def encode1(df, col_name='internet_service_type_id'):
+
+    encoded_values = sorted(list(df[col_name].unique()))
 
     # Integer Encoding
     int_encoder = LabelEncoder()
-    X_train.encoded = int_encoder.fit_transform(X_train[col_name])
-    X_test.encoded = int_encoder.transform(X_test[col_name])
+    df = int_encoder.fit_transform(df[col_name])
 
     # create 2D np arrays of the encoded variable (in train and test)
-    X_train_array = np.array(X_train.encoded).reshape(len(X_train.encoded),1)
-    X_test_array = np.array(X_test.encoded).reshape(len(X_test.encoded),1)
+    df_array = np.array(df.encoded).reshape(len(df.encoded),1)
 
     # One Hot Encoding
     ohe = OneHotEncoder(sparse=False, categories='auto')
-    X_train_ohe = ohe.fit_transform(X_train_array)
-    X_test_ohe = ohe.transform(X_test_array)
+    df_ohe = ohe.fit_transform(df_array)
 
     # Turn the array of new values into a data frame with columns names being the values
     # and index matching that of train/test
     # then merge the new dataframe with the existing train/test dataframe
-    X_train_encoded = pd.DataFrame(data=X_train_ohe,
-                            columns=encoded_values, index=X_train.index)
-    X_train = X_train.join(X_train_encoded)
+    df_encoded = pd.DataFrame(data=df_ohe,
+                            columns=encoded_values, index=df.index)
+    df = df.join(X_train_encoded)
 
-    X_test_encoded = pd.DataFrame(data=X_test_ohe,
-                               columns=encoded_values, index=X_test.index)
-    X_test = X_test.join(X_test_encoded)
+    df['DSL'] = df[1]
+    df['Fiber Optic'] = df[2]
+    df['None'] = df[3]
 
-    return X_train, X_test
+    df = df.drop(columns='internet_service_type_id')
+    df = df.drop(columns=[1, 2, 3])
 
-def scale_minmax(X_train, X_test, column_list):
+    return df
+
+def encode2(df, col_name='internet_service_type_id'):
+
+    encoded_values = sorted(list(X_train[col_name].unique()))
+
+    # Integer Encoding
+    int_encoder = LabelEncoder()
+    df = int_encoder.fit_transform(df[col_name])
+
+    # create 2D np arrays of the encoded variable (in train and test)
+    df_array = np.array(df.encoded).reshape(len(df.encoded),1)
+
+    # One Hot Encoding
+    ohe = OneHotEncoder(sparse=False, categories='auto')
+    df_ohe = ohe.fit_transform(df_array)
+
+    # Turn the array of new values into a data frame with columns names being the values
+    # and index matching that of train/test
+    # then merge the new dataframe with the existing train/test dataframe
+    df_encoded = pd.DataFrame(data=df_ohe,
+                            columns=encoded_values, index=df.index)
+    df = df.join(X_train_encoded)
+
+    df['Month-to-Month'] = df[1]
+    df['One Year'] = df[2]
+    df['Two Year'] = df[3]
+
+    df = df.drop(columns='contract_type_id')
+    df = df.drop(columns=[1, 2, 3])
+
+    return df
+
+
+
+def scale_minmax(df, column_list=['tenure', 'monthly_charges', 'total_charges']):
     scaler = MinMaxScaler()
     column_list_scaled = [col + '_scaled' for col in column_list]
     X_train_scaled = pd.DataFrame(scaler.fit_transform(X_train[column_list]), 
@@ -97,8 +126,17 @@ def scale_minmax(X_train, X_test, column_list):
                                 columns = column_list_scaled, 
                                 index = X_test.index)
     X_test = X_test.join(X_test_scaled)
-    return X_train, X_test, scaler
+    return X_train, X_test
 
+def split_data(df):
+    X = df.drop(columns='churn')
+    y = df['churn']
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = .20, random_state = 123)
+    return X_train, X_test, y_train, y_test
+
+def prepare(df):
+    df=df.pipe(clean_data).pipe(combine_and_clean_variables).pipe(encode1).pipe(encode2).pipe(scale_minmax).pipe(split_data)
+    return df
 
 
 

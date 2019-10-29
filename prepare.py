@@ -22,7 +22,6 @@ def clean_data(df):
     df.replace(r'^\s*$', np.nan, regex=True, inplace=True)
     df["total_charges"] = df["total_charges"].astype('float')
     df = df.dropna()
-    df = df.drop(columns="customer_id")
     df.replace(to_replace=['No', 'Yes'], value=[0, 1], inplace=True)
     df.replace(to_replace=['No phone service'], value=[0], inplace=True)
     df.replace(to_replace=['Female', 'Male'], value=[0, 1], inplace=True)

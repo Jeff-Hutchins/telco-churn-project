@@ -1,6 +1,15 @@
-LINK FOR GOOGLE SLIDES PRESENTATION HERE
 
-LINK FOR TELCO DATASET
+Google Slides
+https://docs.google.com/presentation/d/1tgAGrn60Rt4xNTUMghQKwC4HhX0Z2QKLxmQ3b3zujcM/edit#slide=id.gc6f980f91_0_5
+
+This project is split between three jupyter notebooks(ipynb) and two .py files
+
+Notebook_telco.ipynb - A walk through of my best model, decistion tree classifier, with unscaled as well as scaled/encoded data.
+exploration.ipynb - A walk through of visualizations to help visualize the data.
+telco_logistic_regression.ipynb - Logistic Regresson model (didn't perform as well as decision tree)
+
+acquire.py
+prepare.py
 
 ## About this project:
 Using the telco_churn database, an analysis was conducted to gain insight into why customers were churning.  Since the target variable is a categorical variable, multiple classification methods were used to model the data.
